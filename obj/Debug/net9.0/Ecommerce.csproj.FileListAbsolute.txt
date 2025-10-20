@@ -1,0 +1,9 @@
+D:\CsProject\Ecommerce\obj\Debug\net9.0\Ecommerce.csproj.AssemblyReference.cache
+D:\CsProject\Ecommerce\obj\Debug\net9.0\rpswa.dswa.cache.json
+D:\CsProject\Ecommerce\obj\Debug\net9.0\Ecommerce.GeneratedMSBuildEditorConfig.editorconfig
+D:\CsProject\Ecommerce\obj\Debug\net9.0\Ecommerce.AssemblyInfoInputs.cache
+D:\CsProject\Ecommerce\obj\Debug\net9.0\Ecommerce.AssemblyInfo.cs
+D:\CsProject\Ecommerce\obj\Debug\net9.0\Ecommerce.csproj.CoreCompileInputs.cache
+D:\CsProject\Ecommerce\obj\Debug\net9.0\Ecommerce.MvcApplicationPartsAssemblyInfo.cache
+D:\CsProject\Ecommerce\obj\Debug\net9.0\Ecommerce.RazorAssemblyInfo.cache
+D:\CsProject\Ecommerce\obj\Debug\net9.0\Ecommerce.RazorAssemblyInfo.cs
