@@ -7,7 +7,7 @@ namespace Ecommerce
 {
     public class ConfigureDatabase
     {
-        public string ConnectionString { get; set; } = null!;
-        public string DatabaseName { get; set; } = null!;
+        public string ConnectionString { get; set; } = "mongodb://localhost:27017";
+        public string DatabaseName { get; set; } = "DoAnCuoiKy";
     }
 }

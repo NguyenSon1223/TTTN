@@ -48,3 +48,6 @@ D:\CsProject\Ecommerce\obj\Debug\net8.0\ref\Ecommerce.dll
 D:\CsProject\Ecommerce\bin\Debug\net8.0\Newtonsoft.Json.dll
 D:\CsProject\Ecommerce\bin\Debug\net8.0\payos-lib-backend-dotnet.dll
 D:\CsProject\Ecommerce\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+D:\CsProject\Ecommerce\obj\Debug\net8.0\Ecommerce.sourcelink.json
+D:\CsProject\Ecommerce\bin\Debug\net8.0\AspNetCore.Identity.MongoDbCore.dll
+D:\CsProject\Ecommerce\bin\Debug\net8.0\MongoDbGenericRepository.dll
