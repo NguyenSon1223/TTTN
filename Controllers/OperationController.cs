@@ -1,16 +1,19 @@
 ﻿using Ecommerce.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ecommerce.Controllers
 {
     public class OperationController : Controller
     {
         private UserManager<ApplicationUser> userManager;
+        private RoleManager<ApplicationRole> roleManager;
 
-        public OperationController (UserManager<ApplicationUser> userManager)
+        public OperationController (UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
         {
             this.userManager = userManager;
+            this.roleManager = roleManager;
         }
         public ViewResult Create() => View();
 
@@ -39,6 +42,30 @@ namespace Ecommerce.Controllers
                 
             }
             return View(user);
+        }
+
+        public IActionResult CreateRole() => View();
+
+        [HttpPost]
+        public async Task<IActionResult> CreateRole([Required] string name)
+        {
+            if (ModelState.IsValid)
+            {
+                IdentityResult result = await roleManager.CreateAsync(new ApplicationRole() { Name = name });
+
+                if (result.Succeeded)
+                {
+                    ViewBag.Message = "Role Created Successfully !";
+                }
+                else
+                {
+                    foreach (IdentityError error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                }
+            }
+            return View();
         }
     }
 }

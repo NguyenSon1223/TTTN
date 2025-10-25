@@ -22,7 +22,7 @@ namespace Ecommerce.Controllers
             var orderCode = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             var items = new List<ItemData>
         {
-            new ItemData("Test Product", 1, 100000) // name, quantity, price (VND)
+            new ItemData("Test Product 1", 1, 100000) // name, quantity, price (VND)
         };
 
             var paymentData = new PaymentData(

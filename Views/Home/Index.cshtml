@@ -8,18 +8,29 @@
 
 <div class="container">
     <div class="row">
-        @foreach (var item in Model)
+        @if (Model != null && Model.Any())
         {
-            <div class="col-md-3 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name" />
-                    <div class="card-body">
-                        <h5 class="card-title">@item.Name</h5>
-                        <p class="card-text">@item.Description</p>
-                        <p><strong>Giá:</strong> @item.Price.ToString("N0") đ</p>
-                        <p><strong>Danh mục:</strong> @item.Category</p>
-                        <a href="/Product/Details/@item.Id" class="btn btn-primary btn-sm">Chi tiết</a>
+            foreach (var item in Model)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name" style="height: 200px; object-fit: cover;" />
+                        <div class="card-body">
+                            <h5 class="card-title">@item.Name</h5>
+                            <p class="card-text text-muted" style="min-height: 60px;">@item.Description</p>
+                            <p><strong>Giá:</strong> @item.Price.ToString("N0") đ</p>
+                            <p><strong>Danh mục:</strong> @item.Category</p>
+                            <a href="/Product/Details/@item.Id" class="btn btn-primary btn-sm w-100 mt-2">Xem chi tiết</a>
+                        </div>
                     </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center">
+                <div class="alert alert-info mt-4">
+                    Không có sản phẩm nào để hiển thị.
                 </div>
             </div>
         }

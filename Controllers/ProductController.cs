@@ -13,18 +13,7 @@ namespace Ecommerce.Controllers
             _productService = productService;
         }
 
-        // =========================
-        // 🟩 Hiển thị danh sách sản phẩm
-        // =========================
-        //public async Task<IActionResult> Index(string? category)
-        //{
-        //    var products = string.IsNullOrEmpty(category)
-        //        ? await _productService.GetAllAsync()
-        //        : await _productService.GetByCategoryAsync(category);
-
-        //    return View(products);
-        //}
-
+        
         public async Task<IActionResult> Index(string? category)
         {
             var products = string.IsNullOrEmpty(category)
@@ -41,9 +30,7 @@ namespace Ecommerce.Controllers
             return View(products);
         }
 
-        // =========================
-        // 🟦 Hiển thị chi tiết sản phẩm
-        // =========================
+        
         public async Task<IActionResult> Details(string id)
         {
             if (string.IsNullOrEmpty(id)) return NotFound();
@@ -53,16 +40,13 @@ namespace Ecommerce.Controllers
             return View(product);
         }
 
-        // =========================
-        // 🟨 Hiển thị form tạo mới
-        // =========================
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // Xử lý thêm sản phẩm
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Product product)
@@ -73,10 +57,8 @@ namespace Ecommerce.Controllers
             await _productService.CreateAsync(product);
             return RedirectToAction(nameof(Index));
         }
+        
 
-        // =========================
-        // 🟧 Hiển thị form chỉnh sửa
-        // =========================
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
@@ -88,7 +70,7 @@ namespace Ecommerce.Controllers
             return View(product);
         }
 
-        // Xử lý cập nhật sản phẩm
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, Product updatedProduct)
@@ -100,28 +82,7 @@ namespace Ecommerce.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // =========================
-        // 🟥 Xóa sản phẩm
-        // =========================
-        //[HttpGet]
-        //public async Task<IActionResult> Delete(string id)
-        //{
-        //    if (string.IsNullOrEmpty(id)) return NotFound();
-
-        //    var product = await _productService.GetByIdAsync(id);
-        //    if (product == null) return NotFound();
-
-        //    return View(product);
-        //}
-
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(string id)
-        //{
-        //    await _productService.DeleteAsync(id);
-        //    return RedirectToAction(nameof(Index));
-        //}
-
+        
         [HttpPost]
         public async Task<IActionResult> Delete(string id)
         {
