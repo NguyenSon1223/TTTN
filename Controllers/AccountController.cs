@@ -1,4 +1,6 @@
 ﻿using Ecommerce.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -42,11 +44,21 @@ namespace Ecommerce.Controllers
 
             return View();
         }
-        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            await signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            // Xóa Session (nếu đang bật)
+            HttpContext.Session.Clear();
+
+            // Xóa cookie của Identity
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
+
+            // Xóa cookie xác thực
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Chuyển hướng về trang Login
+            return RedirectToAction("Login", "Account");
         }
     }
 }

@@ -1,5 +1,9 @@
 @model IEnumerable<Ecommerce.Models.Product>
 
+@using Microsoft.AspNetCore.Identity
+@using Ecommerce.Models
+@inject SignInManager<ApplicationUser> SignInManager
+
 @{
     ViewData["Title"] = "Danh sách sản phẩm";
     var categories = ViewBag.Categories as List<string>;
@@ -7,19 +11,17 @@
 }
 
 <div class="container py-4">
-
     <h2 class="text-center mb-4">Danh sách sản phẩm</h2>
 
     <!-- Bộ lọc danh mục -->
     <form method="get" asp-action="Index" class="d-flex justify-content-center mb-4">
         <select id="category" name="category" class="form-select w-auto me-2" onchange="this.form.submit()">
-            <option value="" (string.IsNullOrEmpty(selectedCategory) ? "selected" : "")>-- Tất cả danh mục --</option>
+            <option value="" selected="@(string.IsNullOrEmpty(selectedCategory))">-- Tất cả danh mục --</option>
             @if (categories != null)
             {
                 foreach (var c in categories)
                 {
-                    var isSelected = selectedCategory == c ? "selected" : "";
-                    <option value="@c" isSelected>@c</option>
+                    <option value="@c" selected="@(selectedCategory == c)">@c</option>
                 }
             }
         </select>
@@ -43,9 +45,28 @@
                             <h5 class="card-title text-truncate">@item.Name</h5>
                             <p class="card-text text-danger fw-bold mb-1">@item.Price.ToString("N0") ₫</p>
                             <p class="text-muted small mb-2">@item.Category</p>
-                            <a href="@Url.Action("Details", "Product", new { id = item.Id })" class="btn btn-primary btn-sm">
+
+                            <!-- Nút xem chi tiết -->
+                            <a href="@Url.Action("Details", "Product", new { id = item.Id })" class="btn btn-primary btn-sm me-2">
                                 Xem chi tiết
                             </a>
+
+                            <!-- ✅ Nút thêm vào giỏ hàng (chỉ hiển thị nếu đã đăng nhập) -->
+                            @if (SignInManager.IsSignedIn(User))
+                            {
+                                <form asp-controller="Cart" asp-action="Add" method="post" class="d-inline">
+                                    <input type="hidden" name="productId" value="@item.Id" />
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("Login", "Account")" class="btn btn-outline-secondary btn-sm">
+                                    Đăng nhập để mua
+                                </a>
+                            }
                         </div>
                     </div>
                 </div>

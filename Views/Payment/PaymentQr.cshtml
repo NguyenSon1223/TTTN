@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Thanh toán qua PayOS";
+}
+
+<div class="container text-center py-5">
+    <h3>Quét mã QR để thanh toán</h3>
+    <p class="text-muted mb-4">Tổng tiền: <strong>@ViewBag.Total.ToString("N0") đ</strong></p>
+
+    <img src="@ViewBag.QrCodeUrl" alt="QR Thanh toán" class="img-fluid shadow rounded" style="max-width: 300px;" />
+
+    <div class="mt-4">
+        <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-secondary">Quay lại giỏ hàng</a>
+    </div>
+</div>

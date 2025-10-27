@@ -1,15 +1,14 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Ecommerce.Models
 {
-    public class Cart
+    public class Payment
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = string.Empty;
         public string UserId { get; set; } = string.Empty;
         public List<CartItem> Items { get; set; } = new List<CartItem>();
-        public string Status { get; set; } = "Pending";
+        public decimal Total { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }
