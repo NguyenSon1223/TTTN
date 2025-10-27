@@ -17,6 +17,11 @@ builder.Services.AddSingleton<ProductService>();
 builder.Services.AddSingleton<CartService>();
 builder.Services.AddSingleton<PaymentService>();
 
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+
+builder.Services.AddScoped<EmailService>();
+
 // Đọc config MongoDB
 var mongoDbSettings = builder.Configuration.GetSection(nameof(MongoDbConfig)).Get<MongoDbConfig>();
 

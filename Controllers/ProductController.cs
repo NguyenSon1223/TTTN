@@ -80,7 +80,7 @@ namespace Ecommerce.Controllers
             }
 
             await _productService.CreateAsync(product);
-            TempData["SuccessMessage"] = "✅ Thêm sản phẩm thành công!";
+            TempData["success"] = "✅ Thêm sản phẩm thành công!";
             return RedirectToAction(nameof(Index));
         }
 
@@ -141,7 +141,7 @@ namespace Ecommerce.Controllers
             }
 
             await _productService.UpdateAsync(id, updatedProduct);
-            TempData["SuccessMessage"] = "✅ Cập nhật sản phẩm thành công!";
+            TempData["success"] = "✅ Cập nhật sản phẩm thành công!";
             return RedirectToAction(nameof(Index));
         }
 
@@ -174,7 +174,7 @@ namespace Ecommerce.Controllers
                 return RedirectToAction("Login", "Account");
 
             // Logic tạm (sẽ nối với CartService sau)
-            TempData["SuccessMessage"] = $"🛒 Đã thêm sản phẩm ID: {id} vào giỏ hàng!";
+            TempData["success"] = $"🛒 Đã thêm sản phẩm ID: {id} vào giỏ hàng!";
             return RedirectToAction(nameof(Index));
         }
     }
