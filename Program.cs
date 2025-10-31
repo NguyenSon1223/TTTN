@@ -16,6 +16,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<ProductService>();
 builder.Services.AddSingleton<CartService>();
 builder.Services.AddSingleton<PaymentService>();
+builder.Services.AddSingleton<BillService>();
 
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));

@@ -1,6 +1,7 @@
 ﻿using Ecommerce.Models;
 using MongoDB.Driver;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,98 +9,113 @@ namespace Ecommerce.Services
 {
     public class CartService
     {
-        private readonly IMongoCollection<Cart> _carts;
-        private readonly ProductService _productService;
+        private readonly IMongoCollection<Cart> _cartCollection;
+        private readonly IMongoCollection<Product> _productCollection;
 
-        public CartService(ProductService productService)
+        public CartService()
         {
-            _productService = productService;
             var client = new MongoClient("mongodb://localhost:27017");
-            var db = client.GetDatabase("DoAnCuoiKy");
-            _carts = db.GetCollection<Cart>("Carts");
+            var database = client.GetDatabase("DoAnCuoiKy");
+            _cartCollection = database.GetCollection<Cart>("Carts");
+            _productCollection = database.GetCollection<Product>("Products");
         }
 
+        // ✅ Lấy giỏ hàng theo userId
         public async Task<Cart> GetCartByUserIdAsync(string userId)
         {
-            var cart = await _carts.Find(c => c.UserId == userId).FirstOrDefaultAsync();
+            var cart = await _cartCollection.Find(c => c.UserId == userId).FirstOrDefaultAsync();
+            return cart;
+        }
 
+        // ✅ Tạo giỏ hàng mới nếu chưa có
+        public async Task<Cart> GetOrCreateCartAsync(string userId)
+        {
+            var cart = await GetCartByUserIdAsync(userId);
             if (cart == null)
             {
                 cart = new Cart
                 {
-                    Id = Guid.NewGuid().ToString(), // ✅ tránh duplicate key
                     UserId = userId,
-                    Items = new System.Collections.Generic.List<CartItem>(),
+                    Items = new List<CartItem>(),
                     Status = "Pending"
                 };
-                await _carts.InsertOneAsync(cart);
+                await _cartCollection.InsertOneAsync(cart);
             }
-
-            // Cập nhật dữ liệu sản phẩm trong giỏ
-            foreach (var item in cart.Items)
-            {
-                var p = await _productService.GetByIdAsync(item.ProductId);
-                if (p != null)
-                {
-                    item.ProductName = p.Name;
-                    item.ProductImage = p.ImageUrl;
-                    item.Price = Convert.ToDouble(p.Price);
-                }
-            }
-
             return cart;
         }
 
-        public async Task AddToCartAsync(string userId, string productId, int qty = 1)
+        // ✅ Thêm sản phẩm vào giỏ hàng
+        public async Task AddToCartAsync(string userId, string productId, int quantity)
         {
-            var cart = await GetCartByUserIdAsync(userId);
-            var exist = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+            var cart = await GetOrCreateCartAsync(userId);
+            var product = await _productCollection.Find(p => p.Id == productId).FirstOrDefaultAsync();
 
-            if (exist != null)
-                exist.Quantity += qty;
+            if (product == null)
+                throw new Exception("Sản phẩm không tồn tại.");
+
+            var existingItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+            if (existingItem != null)
+            {
+                existingItem.Quantity += quantity;
+            }
             else
             {
-                var p = await _productService.GetByIdAsync(productId);
-                if (p != null)
+                cart.Items.Add(new CartItem
                 {
-                    cart.Items.Add(new CartItem
-                    {
-                        ProductId = productId,
-                        ProductName = p.Name,
-                        ProductImage = p.ImageUrl,
-                        Price = Convert.ToDouble(p.Price),
-                        Quantity = qty
-                    });
-                }
+                    ProductId = product.Id,
+                    ProductName = product.Name,
+                    Quantity = quantity,
+                    Price = (double)product.Price
+                });
             }
 
-            await _carts.ReplaceOneAsync(c => c.Id == cart.Id, cart);
+            var filter = Builders<Cart>.Filter.Eq(c => c.Id, cart.Id);
+            await _cartCollection.ReplaceOneAsync(filter, cart);
         }
 
+        // ✅ Cập nhật số lượng sản phẩm
+        public async Task UpdateQuantityAsync(string userId, string productId, int quantity)
+        {
+            var cart = await GetOrCreateCartAsync(userId);
+            var item = cart.Items.FirstOrDefault(i => i.ProductId == productId);
+
+            if (item != null)
+            {
+                item.Quantity = quantity;
+                var filter = Builders<Cart>.Filter.Eq(c => c.Id, cart.Id);
+                await _cartCollection.ReplaceOneAsync(filter, cart);
+            }
+        }
+
+        // ✅ Xóa sản phẩm khỏi giỏ
         public async Task RemoveFromCartAsync(string userId, string productId)
         {
-            var cart = await GetCartByUserIdAsync(userId);
+            var cart = await GetOrCreateCartAsync(userId);
             cart.Items.RemoveAll(i => i.ProductId == productId);
-            await _carts.ReplaceOneAsync(c => c.Id == cart.Id, cart);
+
+            var filter = Builders<Cart>.Filter.Eq(c => c.Id, cart.Id);
+            await _cartCollection.ReplaceOneAsync(filter, cart);
         }
 
+        // ✅ Xóa toàn bộ giỏ hàng (sau khi thanh toán)
         public async Task ClearCartAsync(string userId)
         {
             var cart = await GetCartByUserIdAsync(userId);
-            cart.Items.Clear();
-            await _carts.ReplaceOneAsync(c => c.Id == cart.Id, cart);
+            if (cart != null)
+            {
+                cart.Items.Clear();
+                cart.Status = "Empty";
+                var filter = Builders<Cart>.Filter.Eq(c => c.Id, cart.Id);
+                await _cartCollection.ReplaceOneAsync(filter, cart);
+            }
         }
 
-        public async Task UpdateCartStatusAsync(string cartId, string status)
-        {
-            var update = Builders<Cart>.Update.Set(c => c.Status, status);
-            await _carts.UpdateOneAsync(c => c.Id == cartId, update);
-        }
-
+        // ✅ Cập nhật trạng thái giỏ hàng
         public async Task UpdateCartStatusByUserAsync(string userId, string status)
         {
+            var filter = Builders<Cart>.Filter.Eq(c => c.UserId, userId);
             var update = Builders<Cart>.Update.Set(c => c.Status, status);
-            await _carts.UpdateOneAsync(c => c.UserId == userId, update);
+            await _cartCollection.UpdateOneAsync(filter, update);
         }
     }
 }

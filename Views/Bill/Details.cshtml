@@ -1,0 +1,32 @@
+﻿@model Ecommerce.Models.Bill
+
+<div class="container mt-5">
+    <h3 class="text-success mb-3">Chi tiết hóa đơn</h3>
+
+    <p><strong>Mã hóa đơn:</strong> @Model.Id</p>
+    <p><strong>Ngày thanh toán:</strong> @Model.PaidAt.ToString("dd/MM/yyyy HH:mm")</p>
+    <p><strong>Tổng tiền:</strong> @Model.TotalAmount.ToString("N0") ₫</p>
+
+    <h5 class="mt-4">Sản phẩm trong hóa đơn:</h5>
+    <table class="table table-bordered mt-3">
+        <thead class="table-light">
+            <tr>
+                <th>Tên sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Giá</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Price.ToString("N0") ₫</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a href="@Url.Action("Index", "Bill")" class="btn btn-secondary mt-3">Quay lại</a>
+</div>

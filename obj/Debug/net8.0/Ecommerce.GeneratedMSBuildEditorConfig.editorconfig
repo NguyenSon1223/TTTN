@@ -24,6 +24,14 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/CsProject/Ecommerce/Views/Bill/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmlsbFxEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/CsProject/Ecommerce/Views/Bill/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmlsbFxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/CsProject/Ecommerce/Views/Cart/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FydFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

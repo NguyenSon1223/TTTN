@@ -1,0 +1,35 @@
+﻿@model IEnumerable<Ecommerce.Models.Bill>
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-success">Lịch sử thanh toán của bạn</h2>
+
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-success">
+            <tr>
+                <th>Mã Hóa Đơn</th>
+                <th>Ngày Thanh Toán</th>
+                <th>Tổng Tiền</th>
+                <th>Trạng Thái</th>
+                <th>Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bill in Model)
+            {
+                <tr>
+                    <td>@bill.Id</td>
+                    <td>@bill.PaidAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@bill.TotalAmount.ToString("N0") ₫</td>
+                    <td>
+                        <span class="badge bg-success">@bill.Status</span>
+                    </td>
+                    <td>
+                        <a href="@Url.Action("Details", "Bill", new { id = bill.Id })" class="btn btn-outline-success btn-sm">
+                            Xem chi tiết
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
