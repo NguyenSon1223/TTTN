@@ -1,41 +1,45 @@
 using Ecommerce.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Net;
 
 namespace Ecommerce.Services
 {
     public class ProductService
     {
         private readonly IMongoCollection<Product> _products;
+        private readonly IMongoCollection<Category> _categories;
 
         public ProductService()
         {
             var client = new MongoClient("mongodb://localhost:27017");
             var database = client.GetDatabase("DoAnCuoiKy");
             _products = database.GetCollection<Product>("Products");
+            _categories = database.GetCollection<Category>("Categories");
         }
 
-        // Lấy tất cả sản phẩm
-        public async Task<List<Product>> GetAllAsync() =>
-            await _products.Find(_ => true).ToListAsync();
+        public List<Product> GetAll() => _products.Find(_ => true).ToList();
 
-        // Lấy sản phẩm theo ID
-        public async Task<Product?> GetByIdAsync(string id) =>
-            await _products.Find(p => p.Id == id).FirstOrDefaultAsync();
+        public Product GetById(string id) =>
+            _products.Find(p => p.Id == id).FirstOrDefault();
 
-        // Tạo mới sản phẩm
-        public async Task CreateAsync(Product product) =>
-            await _products.InsertOneAsync(product);
+        public void Create(Product product)
+        {
+            if (string.IsNullOrEmpty(product.Id))
+                product.Id = MongoDB.Bson.ObjectId.GenerateNewId().ToString();
 
-        // Cập nhật sản phẩm
-        public async Task UpdateAsync(string id, Product updatedProduct) =>
-            await _products.ReplaceOneAsync(p => p.Id == id, updatedProduct);
+            _products.InsertOne(product);
+        }
 
-        // Xóa sản phẩm
-        public async Task DeleteAsync(string id) =>
-            await _products.DeleteOneAsync(p => p.Id == id);
+        public void Update(string id, Product product)
+        {
+            _products.ReplaceOne(p => p.Id == id, product);
+        }
 
-        // ✅ Lọc theo Category
-        public async Task<List<Product>> GetByCategoryAsync(string category) =>
-            await _products.Find(p => p.Category == category).ToListAsync();
+        public void Delete(string id)
+        {
+            _products.DeleteOne(p => p.Id == id);
+        }
+
     }
 }

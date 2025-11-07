@@ -1,82 +1,178 @@
-@model IEnumerable<Ecommerce.Models.Product>
-
-@using Microsoft.AspNetCore.Identity
-@using Ecommerce.Models
-@inject SignInManager<ApplicationUser> SignInManager
-
+@* @model IEnumerable<dynamic>
 @{
     ViewData["Title"] = "Danh sách sản phẩm";
-    var categories = ViewBag.Categories as List<string>;
-    var selectedCategory = ViewBag.SelectedCategory as string;
 }
 
-<div class="container py-4">
-    <h2 class="text-center mb-4">Danh sách sản phẩm</h2>
+<h2 class="text-center mb-4">Danh sách sản phẩm</h2>
 
-    <!-- Bộ lọc danh mục -->
-    <form method="get" asp-action="Index" class="d-flex justify-content-center mb-4">
-        <select id="category" name="category" class="form-select w-auto me-2" onchange="this.form.submit()">
-            <option value="" selected="@(string.IsNullOrEmpty(selectedCategory))">-- Tất cả danh mục --</option>
-            @if (categories != null)
-            {
-                foreach (var c in categories)
-                {
-                    <option value="@c" selected="@(selectedCategory == c)">@c</option>
-                }
-            }
-        </select>
+<div class="text-end mb-3">
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Thêm sản phẩm mới
+    </a>
+</div>
 
-        @if (!string.IsNullOrEmpty(selectedCategory))
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info text-center">
+        Hiện chưa có sản phẩm nào được thêm.
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var item in Model)
         {
-            <a href="@Url.Action("Index", "Product")" class="btn btn-outline-secondary">Xóa lọc</a>
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="~/images/@item.ImageUrl"
+                         class="card-img-top"
+                         alt="@item.Name"
+                         style="height: 200px; object-fit: cover;" />
+
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Name</h5>
+                        <p class="card-text text-muted">
+                            @item.Description
+                        </p>
+                        <p class="card-text">
+                            <strong>Giá:</strong> @item.Price.ToString("N0") đ
+                        </p>
+                        <p class="card-text">
+                            <strong>Danh mục:</strong>
+                            <span class="badge bg-secondary">@item.CategoryName</span>
+                        </p>
+                    </div>
+
+                    <div class="card-footer bg-white border-0 text-center">
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm me-2">
+                            <i class="bi bi-pencil-square"></i> Sửa
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash"></i> Xóa
+                        </a>
+                    </div>
+                </div>
+            </div>
         }
-    </form>
+    </div>
+} *@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Danh sách sản phẩm";
+}
 
-    <!-- Danh sách sản phẩm -->
-    <div class="row g-4 justify-content-center">
-        @if (Model != null && Model.Any())
-        {
-            foreach (var item in Model)
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">📦 Danh sách sản phẩm</h2>
+        <a asp-action="Create" class="btn btn-success px-4">➕ Thêm sản phẩm</a>
+    </div>
+
+    <!-- Thông báo -->
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">@TempData["Message"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row">
+            @foreach (var item in Model)
             {
-                <div class="col-md-3 col-sm-6">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="~/img/@item.ImageUrl" class="card-img-top" alt="@item.Name" style="height: 200px; object-fit: cover;">
-                        <div class="card-body text-center">
-                            <h5 class="card-title text-truncate">@item.Name</h5>
-                            <p class="card-text text-danger fw-bold mb-1">@item.Price.ToString("N0") ₫</p>
-                            <p class="text-muted small mb-2">@item.Category</p>
-
-                            <!-- Nút xem chi tiết -->
-                            <a href="@Url.Action("Details", "Product", new { id = item.Id })" class="btn btn-primary btn-sm me-2">
-                                Xem chi tiết
-                            </a>
-
-                            <!-- ✅ Nút thêm vào giỏ hàng (chỉ hiển thị nếu đã đăng nhập) -->
-                            @if (SignInManager.IsSignedIn(User))
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm border-0 h-100 rounded-4 product-card">
+                        <div class="card-img-top text-center p-2" style="height: 220px;">
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
                             {
-                                <form asp-controller="Cart" asp-action="Add" method="post" class="d-inline">
-                                    <input type="hidden" name="productId" value="@item.Id" />
-                                    <button type="submit" class="btn btn-success btn-sm">
-                                        <i class="bi bi-cart-plus"></i> Thêm vào giỏ
-                                    </button>
-                                </form>
+                                <img src="~/img/@item.ImageUrl" alt="@item.Name" class="img-fluid rounded" style="max-height: 200px; object-fit: cover;" />
                             }
                             else
                             {
-                                <a href="@Url.Action("Login", "Account")" class="btn btn-outline-secondary btn-sm">
-                                    Đăng nhập để mua
-                                </a>
+                                <img src="~/img/no-image.png" alt="No image" class="img-fluid rounded" style="max-height: 200px; object-fit: contain;" />
                             }
+                        </div>
+
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <div>
+                                <h5 class="card-title fw-bold text-dark">@item.Name</h5>
+                                <p class="text-muted mb-2">
+                                    <strong>Giá:</strong> @String.Format("{0:N0} VNĐ", item.Price)
+                                </p>
+                                <p class="small text-secondary mb-2" style="height: 40px; overflow: hidden;">
+                                    @item.Description
+                                </p>
+                                <p class="badge bg-info text-dark px-3">
+                                    Danh mục: @item.CategoryName
+                                </p>
+                            </div>
+
+                            <div class="mt-3 d-flex justify-content-between">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm px-3"> Sửa</a>
+                                <button class="btn btn-danger btn-sm px-3" onclick="confirmDelete('@item.Id')"> Xóa</button>
+                            </div>
+                            <form asp-controller="Cart" asp-action="Add" method="post" class="d-inline">
+                                <input type="hidden" name="productId" value="@item.Id" />
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
             }
-        }
-        else
-        {
-            <div class="text-center text-muted mt-5">
-                <p>Không có sản phẩm nào trong danh mục này.</p>
-            </div>
-        }
-    </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">Chưa có sản phẩm nào!</div>
+    }
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(id) {
+            Swal.fire({
+                title: "Xóa sản phẩm?",
+                text: "Bạn có chắc chắn muốn xóa sản phẩm này không?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Có, xóa ngay!",
+                cancelButtonText: "Hủy",
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/Product/Delete/${id}`, {
+                        method: "POST"
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire("Đã xóa!", "Sản phẩm đã được xóa.", "success").then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire("Lỗi!", data.message || "Không thể xóa sản phẩm.", "error");
+                        }
+                    })
+                    .catch(err => Swal.fire("Lỗi!", "Không thể kết nối tới server.", "error"));
+                }
+            });
+        }
+    </script>
+
+    <style>
+        .product-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .product-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            }
+    </style>
+}

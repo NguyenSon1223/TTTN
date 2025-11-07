@@ -18,7 +18,6 @@ namespace Ecommerce.Controllers
             _userManager = userManager;
         }
 
-        // ✅ Hiển thị giỏ hàng
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -26,12 +25,11 @@ namespace Ecommerce.Controllers
             if (user == null)
                 return RedirectToAction("Login", "Account");
 
-            // Ép kiểu GUID sang string
+            
             var cart = await _cartService.GetCartByUserIdAsync(user.Id.ToString());
             return View(cart);
         }
 
-        // ✅ Thêm sản phẩm vào giỏ
         [HttpPost]
         public async Task<IActionResult> Add(string productId, int qty = 1)
         {
@@ -40,11 +38,10 @@ namespace Ecommerce.Controllers
                 return RedirectToAction("Login", "Account");
 
             await _cartService.AddToCartAsync(user.Id.ToString(), productId, qty);
-            TempData["Success"] = "✅ Đã thêm sản phẩm vào giỏ hàng!";
+            TempData["Success"] = " Đã thêm sản phẩm vào giỏ hàng!";
             return RedirectToAction("Index", "Product");
         }
 
-        // ✅ Cập nhật số lượng sản phẩm trong giỏ
         [HttpPost]
         public async Task<IActionResult> Update(string productId, int qty)
         {
@@ -56,7 +53,6 @@ namespace Ecommerce.Controllers
             return RedirectToAction("Index");
         }
 
-        // ✅ Xóa sản phẩm khỏi giỏ
         [HttpPost]
         public async Task<IActionResult> Remove(string productId)
         {
@@ -68,7 +64,6 @@ namespace Ecommerce.Controllers
             return RedirectToAction("Index");
         }
 
-        // ✅ Xóa toàn bộ giỏ hàng
         [HttpPost]
         public async Task<IActionResult> Clear()
         {

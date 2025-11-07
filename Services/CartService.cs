@@ -20,14 +20,12 @@ namespace Ecommerce.Services
             _productCollection = database.GetCollection<Product>("Products");
         }
 
-        // ✅ Lấy giỏ hàng theo userId
         public async Task<Cart> GetCartByUserIdAsync(string userId)
         {
             var cart = await _cartCollection.Find(c => c.UserId == userId).FirstOrDefaultAsync();
             return cart;
         }
 
-        // ✅ Tạo giỏ hàng mới nếu chưa có
         public async Task<Cart> GetOrCreateCartAsync(string userId)
         {
             var cart = await GetCartByUserIdAsync(userId);
@@ -44,7 +42,6 @@ namespace Ecommerce.Services
             return cart;
         }
 
-        // ✅ Thêm sản phẩm vào giỏ hàng
         public async Task AddToCartAsync(string userId, string productId, int quantity)
         {
             var cart = await GetOrCreateCartAsync(userId);
@@ -73,7 +70,6 @@ namespace Ecommerce.Services
             await _cartCollection.ReplaceOneAsync(filter, cart);
         }
 
-        // ✅ Cập nhật số lượng sản phẩm
         public async Task UpdateQuantityAsync(string userId, string productId, int quantity)
         {
             var cart = await GetOrCreateCartAsync(userId);
@@ -87,7 +83,6 @@ namespace Ecommerce.Services
             }
         }
 
-        // ✅ Xóa sản phẩm khỏi giỏ
         public async Task RemoveFromCartAsync(string userId, string productId)
         {
             var cart = await GetOrCreateCartAsync(userId);
@@ -97,7 +92,6 @@ namespace Ecommerce.Services
             await _cartCollection.ReplaceOneAsync(filter, cart);
         }
 
-        // ✅ Xóa toàn bộ giỏ hàng (sau khi thanh toán)
         public async Task ClearCartAsync(string userId)
         {
             var cart = await GetCartByUserIdAsync(userId);
@@ -110,7 +104,6 @@ namespace Ecommerce.Services
             }
         }
 
-        // ✅ Cập nhật trạng thái giỏ hàng
         public async Task UpdateCartStatusByUserAsync(string userId, string status)
         {
             var filter = Builders<Cart>.Filter.Eq(c => c.UserId, userId);

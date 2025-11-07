@@ -21,11 +21,9 @@ namespace Ecommerce.Controllers
             _userManager = userManager;
         }
 
-        // ✅ 1. Hiển thị tất cả hóa đơn đã thanh toán của user hiện tại
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            // Lấy ID user đang đăng nhập
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(userId))
@@ -34,21 +32,17 @@ namespace Ecommerce.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            // Lấy danh sách hóa đơn từ database
             var bills = await _billService.GetBillsByUserIdAsync(userId);
 
-            // Nếu người dùng chưa có hóa đơn
             if (bills == null || !bills.Any())
             {
                 ViewBag.Message = "Bạn chưa có giao dịch nào.";
                 return View("Empty");
             }
 
-            // Trả danh sách hóa đơn cho View
             return View(bills.OrderByDescending(b => b.PaidAt).ToList());
         }
 
-        // ✅ 2. Hiển thị chi tiết 1 hóa đơn cụ thể
         [HttpGet]
         public async Task<IActionResult> Details(string id)
         {
@@ -58,7 +52,6 @@ namespace Ecommerce.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var bill = await _billService.GetBillByIdAsync(id);
 
-            // Kiểm tra hóa đơn có thuộc về user không
             if (bill == null || bill.UserId != userId)
             {
                 TempData["Error"] = "Bạn không có quyền xem hóa đơn này.";

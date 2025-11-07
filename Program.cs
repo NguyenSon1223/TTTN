@@ -12,28 +12,25 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-// Đăng ký dịch vụ
 builder.Services.AddSingleton<ProductService>();
 builder.Services.AddSingleton<CartService>();
 builder.Services.AddSingleton<PaymentService>();
 builder.Services.AddSingleton<BillService>();
+builder.Services.AddSingleton<CategoryService>();
 
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
 
 builder.Services.AddScoped<EmailService>();
 
-// Đọc config MongoDB
 var mongoDbSettings = builder.Configuration.GetSection(nameof(MongoDbConfig)).Get<MongoDbConfig>();
 
-// Đăng ký Identity dùng MongoDB
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>(
         mongoDbSettings.ConnectionString,
         mongoDbSettings.Name)
     .AddDefaultTokenProviders();
 
-// Cấu hình Cookie Auth
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -44,7 +41,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
     });
 
-// ✅ Bật Session (rất quan trọng)
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -54,7 +50,6 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
-// Middleware
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -66,7 +61,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession(); // ✅ Session phải trước Authentication
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 

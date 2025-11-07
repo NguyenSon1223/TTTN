@@ -39,11 +39,9 @@ namespace Ecommerce.Controllers
             _userManager = userManager;
         }
 
-        // ✅ Tạo yêu cầu thanh toán
         [HttpGet("Payment/Create")]
         public async Task<IActionResult> Create()
         {
-            // Lấy user hiện tại
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
                 return RedirectToAction("Login", "Account");
@@ -71,7 +69,6 @@ namespace Ecommerce.Controllers
 
             var paymentLink = await _payOS.createPaymentLink(paymentData);
 
-            // Chuyển trạng thái giỏ hàng
             await _cartService.UpdateCartStatusByUserAsync(userId, "Processing");
 
             return Redirect(paymentLink.checkoutUrl);
@@ -82,13 +79,11 @@ namespace Ecommerce.Controllers
             return View();
         }
 
-        // ✅ Khi thanh toán thành công
         [HttpGet("/payment/success")]
         public async Task<IActionResult> Success()
         {
             try
             {
-                // 1️⃣ Lấy thông tin user
                 var user = await _userManager.GetUserAsync(User);
                 if (user == null)
                 {
@@ -98,7 +93,6 @@ namespace Ecommerce.Controllers
 
                 var userId = user.Id.ToString();
 
-                // 2️⃣ Lấy giỏ hàng
                 var cart = await _cartService.GetCartByUserIdAsync(userId);
                 if (cart == null || cart.Items == null || !cart.Items.Any())
                 {
@@ -106,7 +100,6 @@ namespace Ecommerce.Controllers
                     return RedirectToAction("Index", "Cart");
                 }
 
-                // 3️⃣ Cập nhật trạng thái và tạo hóa đơn
                 await _cartService.UpdateCartStatusByUserAsync(userId, "Paid");
                 var success = await _billService.CreateBillAsync(userId);
 
@@ -116,7 +109,6 @@ namespace Ecommerce.Controllers
                     return RedirectToAction("Index", "Cart");
                 }
 
-                // 4️⃣ Lấy lại hóa đơn vừa tạo
                 var bills = await _billService.GetBillsByUserIdAsync(userId);
                 var bill = bills.FirstOrDefault();
 
@@ -128,7 +120,6 @@ namespace Ecommerce.Controllers
                     return RedirectToAction("Index", "Cart");
                 }
 
-                // 5️⃣ Gửi email xác nhận thanh toán
                 try
                 {
                     var subject = "🎉 Xác nhận thanh toán thành công!";
@@ -177,7 +168,6 @@ namespace Ecommerce.Controllers
                     Console.WriteLine("[Email Error] " + emailEx.Message);
                 }
 
-                // 6️⃣ Trả về view thành công
                 return View("Success", bill);
             }
             catch (Exception ex)

@@ -36,12 +36,11 @@ namespace Ecommerce.Services
                     _config["EmailSettings:Username"],
                     _config["EmailSettings:Password"]
                 ),
-                EnableSsl = true,       // 🔹 BẮT BUỘC cho Gmail
+                EnableSsl = true,      
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 UseDefaultCredentials = false
             };
 
-            // 🔹 Bắt buộc khởi tạo TLS thủ công cho một số SMTP client
             smtp.TargetName = "STARTTLS/smtp.gmail.com";
 
             await smtp.SendMailAsync(mail);

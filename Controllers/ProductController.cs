@@ -1,181 +1,157 @@
 using Ecommerce.Models;
 using Ecommerce.Services;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ecommerce.Controllers
 {
     public class ProductController : Controller
     {
         private readonly ProductService _productService;
-        private readonly IWebHostEnvironment _environment;
+        private readonly CategoryService _categoryService;
+        private readonly IWebHostEnvironment _environtment;
 
-        public ProductController(ProductService productService, IWebHostEnvironment environment)
+        public ProductController(ProductService productService, CategoryService categoryService, IWebHostEnvironment environment)
         {
             _productService = productService;
-            _environment = environment;
+            _categoryService = categoryService;
+            _environtment = environment;
         }
 
-        // ========== DANH SÁCH SẢN PHẨM ==========
-        public async Task<IActionResult> Index(string? category)
+        [HttpGet]
+        public IActionResult Index()
         {
-            var products = string.IsNullOrEmpty(category)
-                ? await _productService.GetAllAsync()
-                : await _productService.GetByCategoryAsync(category);
+            var products = _productService.GetAll();
+            var categories = _categoryService.GetAll();
 
-            // Lấy danh sách Category duy nhất
-            var allProducts = await _productService.GetAllAsync();
-            var categories = allProducts.Select(p => p.Category).Distinct().ToList();
+            var viewModel = products.Select(p => new
+            {
+                p.Id,
+                p.Name,
+                p.Description,
+                p.ImageUrl,
+                p.Price,
+                CategoryName = categories.FirstOrDefault(c => c.Id == p.CategoryId)?.Name ?? "Không xác định"
+            }).ToList();
 
-            ViewBag.Categories = categories;
-            ViewBag.SelectedCategory = category;
-
-            return View(products);
+            return View(viewModel);
         }
 
-        // ========== CHI TIẾT SẢN PHẨM ==========
-        public async Task<IActionResult> Details(string id)
-        {
-            if (string.IsNullOrEmpty(id))
-                return NotFound();
-
-            var product = await _productService.GetByIdAsync(id);
-            if (product == null)
-                return NotFound();
-
-            return View(product);
-        }
-
-        // ========== TẠO SẢN PHẨM ==========
         [HttpGet]
         public IActionResult Create()
         {
+            ViewBag.Categories = _categoryService.GetAll();
             return View();
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Product product, IFormFile? ImageFile)
+        public async Task<IActionResult> Create(Product product, IFormFile? imageFile)
         {
-            if (!ModelState.IsValid)
-                return View(product);
-
-            // ✅ Xử lý upload hình ảnh
-            if (ImageFile != null && ImageFile.Length > 0)
+            try
             {
-                var uploadDir = Path.Combine(_environment.WebRootPath, "img");
-                if (!Directory.Exists(uploadDir))
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    var ext = Path.GetExtension(imageFile.FileName).ToLower();
+                    var allowedExt = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+
+                    if (!allowedExt.Contains(ext))
+                    {
+                        TempData["Error"] = "Chỉ được tải lên file ảnh (jpg, png, gif, webp)!";
+                        ViewBag.Categories = _categoryService.GetAll();
+                        return View(product);
+                    }
+
+                    var uploadDir = Path.Combine(_environtment.WebRootPath, "img");
                     Directory.CreateDirectory(uploadDir);
 
-                var fileExt = Path.GetExtension(ImageFile.FileName);
-                var fileName = Path.GetFileNameWithoutExtension(ImageFile.FileName);
-                var uniqueFileName = $"{fileName}_{Guid.NewGuid()}{fileExt}";
-                var filePath = Path.Combine(uploadDir, uniqueFileName);
+                    var uniqueFileName = $"{Path.GetFileNameWithoutExtension(imageFile.FileName)}_{Guid.NewGuid()}{ext}";
+                    var filePath = Path.Combine(uploadDir, uniqueFileName);
 
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await ImageFile.CopyToAsync(fileStream);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+
+                    product.ImageUrl = uniqueFileName;
                 }
 
-                product.ImageUrl = uniqueFileName;
-            }
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.Categories = _categoryService.GetAll();
+                    TempData["Error"] = "Dữ liệu không hợp lệ!";
+                    return View(product);
+                }
 
-            await _productService.CreateAsync(product);
-            TempData["success"] = "✅ Thêm sản phẩm thành công!";
-            return RedirectToAction(nameof(Index));
+                if (string.IsNullOrEmpty(product.ImageUrl))
+                    product.ImageUrl = string.Empty;
+
+                _productService.Create(product);
+                TempData["Message"] = "Thêm sản phẩm thành công!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Categories = _categoryService.GetAll();
+                TempData["Error"] = $"Lỗi khi tạo sản phẩm: {ex.Message}";
+                return View(product);
+            }
         }
 
-        // ========== CHỈNH SỬA SẢN PHẨM ==========
+
+
         [HttpGet]
-        public async Task<IActionResult> Edit(string id)
+        public IActionResult Edit(string id)
         {
-            if (string.IsNullOrEmpty(id)) return NotFound();
+            var product = _productService.GetById(id);
+            if (product == null)
+            {
+                TempData["Error"] = "Không tìm thấy sản phẩm.";
+                return RedirectToAction("Index");
+            }
 
-            var product = await _productService.GetByIdAsync(id);
-            if (product == null) return NotFound();
-
+            ViewBag.Categories = _categoryService.GetAll();
             return View(product);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, Product updatedProduct, IFormFile? ImageFile)
+        public IActionResult Edit(string id, Product product)
         {
-            if (!ModelState.IsValid)
-                return View(updatedProduct);
-
-            var existingProduct = await _productService.GetByIdAsync(id);
-            if (existingProduct == null)
-                return NotFound();
-
-            // ✅ Nếu có upload hình mới
-            if (ImageFile != null && ImageFile.Length > 0)
+            try
             {
-                var uploadDir = Path.Combine(_environment.WebRootPath, "img");
-                if (!Directory.Exists(uploadDir))
-                    Directory.CreateDirectory(uploadDir);
-
-                var fileExt = Path.GetExtension(ImageFile.FileName);
-                var fileName = Path.GetFileNameWithoutExtension(ImageFile.FileName);
-                var uniqueFileName = $"{fileName}_{Guid.NewGuid()}{fileExt}";
-                var filePath = Path.Combine(uploadDir, uniqueFileName);
-
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                if (!ModelState.IsValid)
                 {
-                    await ImageFile.CopyToAsync(fileStream);
+                    ViewBag.Categories = _categoryService.GetAll();
+                    TempData["Error"] = "Dữ liệu không hợp lệ!";
+                    return View(product);
                 }
 
-                // ✅ Xóa hình cũ nếu có
-                if (!string.IsNullOrEmpty(existingProduct.ImageUrl))
-                {
-                    var oldImagePath = Path.Combine(uploadDir, existingProduct.ImageUrl);
-                    if (System.IO.File.Exists(oldImagePath))
-                        System.IO.File.Delete(oldImagePath);
-                }
-
-                updatedProduct.ImageUrl = uniqueFileName;
+                _productService.Update(id, product);
+                TempData["Message"] = "Cập nhật sản phẩm thành công!";
+                return RedirectToAction("Index");
             }
-            else
+            catch (Exception ex)
             {
-                // Giữ lại hình cũ
-                updatedProduct.ImageUrl = existingProduct.ImageUrl;
+                ViewBag.Categories = _categoryService.GetAll();
+                TempData["Error"] = "Lỗi khi cập nhật: " + ex.Message;
+                return View(product);
             }
-
-            await _productService.UpdateAsync(id, updatedProduct);
-            TempData["success"] = "✅ Cập nhật sản phẩm thành công!";
-            return RedirectToAction(nameof(Index));
         }
 
-        // ========== XOÁ SẢN PHẨM ==========
         [HttpPost]
-        public async Task<IActionResult> Delete(string id)
+        public IActionResult Delete(string id)
         {
-            var product = await _productService.GetByIdAsync(id);
-            if (product == null)
-                return NotFound();
-
-            // Xóa hình nếu có
-            if (!string.IsNullOrEmpty(product.ImageUrl))
+            try
             {
-                var uploadDir = Path.Combine(_environment.WebRootPath, "img");
-                var oldImagePath = Path.Combine(uploadDir, product.ImageUrl);
-                if (System.IO.File.Exists(oldImagePath))
-                    System.IO.File.Delete(oldImagePath);
+                _productService.Delete(id);
+                return Json(new { success = true });
             }
-
-            await _productService.DeleteAsync(id);
-            return Ok(new { message = "Đã xóa sản phẩm!" });
-        }
-
-        // ========== THÊM VÀO GIỎ HÀNG ==========
-        [HttpPost]
-        public IActionResult AddToCart(string id)
-        {
-            if (!User.Identity.IsAuthenticated)
-                return RedirectToAction("Login", "Account");
-
-            // Logic tạm (sẽ nối với CartService sau)
-            TempData["success"] = $"🛒 Đã thêm sản phẩm ID: {id} vào giỏ hàng!";
-            return RedirectToAction(nameof(Index));
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
     }
 }

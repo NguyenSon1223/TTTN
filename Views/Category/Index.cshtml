@@ -1,0 +1,80 @@
+﻿@model IEnumerable<Ecommerce.Models.Category>
+
+@{
+    ViewData["Title"] = "Danh sách danh mục";
+}
+
+<h2>Danh sách danh mục</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-success mb-3">+ Thêm danh mục</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tên danh mục</th>
+            <th>Mô tả</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cat in Model)
+        {
+            <tr>
+                <td>@cat.Name</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@cat.Id" class="btn btn-primary btn-sm">Sửa</a>
+                    <button class="btn btn-danger btn-sm" onclick="confirmDelete('@cat.Id')">Xóa</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(id) {
+            Swal.fire({
+                title: "Bạn có chắc chắn muốn xóa?",
+                text: "Danh mục này sẽ bị xóa vĩnh viễn!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Có, xóa nó!",
+                cancelButtonText: "Hủy",
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/Category/Delete/${id}`, {
+                        method: "POST"
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Đã xóa!",
+                                text: "Danh mục đã được xóa thành công.",
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => location.reload());
+                        } else {
+                            Swal.fire("Lỗi!", data.message || "Không thể xóa danh mục.", "error");
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

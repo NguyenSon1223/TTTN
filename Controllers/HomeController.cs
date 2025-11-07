@@ -19,20 +19,10 @@ public class HomeController : Controller
         
     }
 
-    public async Task<IActionResult> Index(string? category)
+    public async Task<IActionResult> Index()
     {
-        var products = string.IsNullOrEmpty(category)
-            ? await _productService.GetAllAsync()
-            : await _productService.GetByCategoryAsync(category);
 
-        // Lấy danh sách Category duy nhất
-        var allProducts = await _productService.GetAllAsync();
-        var categories = allProducts.Select(p => p.Category).Distinct().ToList();
-
-        ViewBag.Categories = categories;
-        ViewBag.SelectedCategory = category;
-
-        return View(products);
+        return View();
     }
 
     public IActionResult Privacy()

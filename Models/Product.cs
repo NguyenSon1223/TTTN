@@ -3,6 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Ecommerce.Models
 {
+    [BsonIgnoreExtraElements]
     public class Product
     {
         [BsonId]
@@ -21,7 +22,6 @@ namespace Ecommerce.Models
         [BsonElement("ImageUrl")]
         public string? ImageUrl { get; set; }
 
-        [BsonElement("Category")]
-        public string? Category { get; set; }   // ✅ trường lọc sản phẩm theo danh mục
+        public string CategoryId { get; set; } 
     }
 }

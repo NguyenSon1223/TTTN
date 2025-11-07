@@ -13,6 +13,7 @@
         <PackageReference Include="payOS" Version="1.0.9" />
     </ItemGroup>
     <ItemGroup>
+      <Folder Include="Seeder\" />
       <Folder Include="wwwroot\img\" />
     </ItemGroup>
 </Project>

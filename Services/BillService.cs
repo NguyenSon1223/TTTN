@@ -20,9 +20,6 @@ namespace Ecommerce.Services
             _bills = db.GetCollection<Bill>("Bills");
         }
 
-        /// <summary>
-        /// ✅ Tạo hóa đơn mới sau khi thanh toán thành công
-        /// </summary>
         public async Task<bool> CreateBillAsync(string userId)
         {
             var cart = await _cartService.GetCartByUserIdAsync(userId);
@@ -47,49 +44,30 @@ namespace Ecommerce.Services
 
             await _bills.InsertOneAsync(bill);
 
-            //await _cartService.ClearCartAsync(userId);
 
             return true;
         }
-
-        /// <summary>
-        /// ✅ Lấy danh sách hóa đơn theo người dùng
-        /// </summary>
         public async Task<List<Bill>> GetBillsByUserIdAsync(string userId)
         {
             return await _bills.Find(b => b.UserId == userId)
                                .SortByDescending(b => b.PaidAt)
                                .ToListAsync();
         }
-
-        /// <summary>
-        /// ✅ Lấy chi tiết 1 hóa đơn theo ID
-        /// </summary>
         public async Task<Bill> GetBillByIdAsync(string id)
         {
             return await _bills.Find(b => b.Id == id).FirstOrDefaultAsync();
         }
-
-        /// <summary>
-        /// ✅ Cập nhật trạng thái hóa đơn
-        /// </summary>
         public async Task UpdateBillStatusAsync(string billId, string status)
         {
             var update = Builders<Bill>.Update.Set(b => b.Status, status);
             await _bills.UpdateOneAsync(b => b.Id == billId, update);
         }
 
-        /// <summary>
-        /// ✅ Xóa hóa đơn theo ID
-        /// </summary>
         public async Task DeleteBillAsync(string billId)
         {
             await _bills.DeleteOneAsync(b => b.Id == billId);
         }
 
-        /// <summary>
-        /// ✅ Lấy toàn bộ hóa đơn (dành cho Admin)
-        /// </summary>
         public async Task<List<Bill>> GetAllBillsAsync()
         {
             return await _bills.Find(_ => true)
