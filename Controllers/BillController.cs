@@ -37,7 +37,7 @@ namespace Ecommerce.Controllers
             if (bills == null || !bills.Any())
             {
                 ViewBag.Message = "Bạn chưa có giao dịch nào.";
-                return View("Empty");
+                return View();
             }
 
             return View(bills.OrderByDescending(b => b.PaidAt).ToList());

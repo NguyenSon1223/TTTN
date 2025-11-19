@@ -2,7 +2,9 @@ wwwroot\css\site.css
 wwwroot\favicon.ico
 wwwroot\img\Ban-an-8-cho-Coastal-1_4f1d52df-5275-492d-abba-e978de155e5d.jpg
 wwwroot\img\BAN-LAM-VIEC-WING-MAU-DEN-3p-3_fb908902-40c8-43fd-9ce1-4f0fbd83181d.jpg
+wwwroot\img\download.png
 wwwroot\img\iphone-16-pro-max_7cfa7652-e455-4f72-aa2e-1ad7df60aa82.jpg
+wwwroot\img\Logo.png
 wwwroot\img\samsung-galaxy-z-fold-7-xanh_c3551483-917e-4789-9061-b81158dd248d.jpg
 wwwroot\img\sony-wh-1000xm6_57ad7c17-6875-4d42-97a0-c4c24418d814.jpg
 wwwroot\img\text_ng_n_2__10_104_16697416-9097-4047-8f50-ed0422a2a0f7.jpg

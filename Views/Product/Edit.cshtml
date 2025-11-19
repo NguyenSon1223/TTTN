@@ -17,8 +17,14 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="CategoryId" class="form-label fw-semibold">Danh mục</label>
-                <input asp-for="CategoryId" class="form-control" />
+                <label asp-for="CategoryId" class="form-label fw-bold">Danh mục</label>
+                <select asp-for="CategoryId" class="form-select">
+                    <option value="">-- Chọn danh mục --</option>
+                    @foreach (var cat in ViewBag.Categories)
+                    {
+                        <option value="@cat.Id">@cat.Name</option>
+                    }
+                </select>
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
 

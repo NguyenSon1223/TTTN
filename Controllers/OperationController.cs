@@ -26,11 +26,14 @@ namespace Ecommerce.Controllers
                 {
                     UserName = user.Name,
                     Email = user.Email,
+                    
                 };
                 IdentityResult result = await userManager.CreateAsync(appUser, user.Password);
+
+                await userManager.AddToRoleAsync(appUser, "Admin");
                 if (result.Succeeded)
                 {
-                    ViewBag.Message = "User Created Successfully !";
+                    TempData["success"] = "Tài khoản đã được tạo!";
                 }
                 else
                 {
@@ -41,7 +44,7 @@ namespace Ecommerce.Controllers
                 }
                 
             }
-            return View(user);
+            return RedirectToAction("Login", "Account");
         }
 
         public IActionResult CreateRole() => View();

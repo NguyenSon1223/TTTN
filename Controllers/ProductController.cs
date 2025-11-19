@@ -22,11 +22,19 @@ namespace Ecommerce.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(string? categoryId)
         {
-            var products = _productService.GetAll();
             var categories = _categoryService.GetAll();
+            ViewBag.Categories = categories;
 
+            ViewData["CurrentCategoryId"] = categoryId;
+
+            var products = _productService.GetAll();
+
+            if (!string.IsNullOrEmpty(categoryId))
+            {
+                products = products.Where(p => p.CategoryId == categoryId).ToList();
+            }
             var viewModel = products.Select(p => new
             {
                 p.Id,
@@ -36,7 +44,6 @@ namespace Ecommerce.Controllers
                 p.Price,
                 CategoryName = categories.FirstOrDefault(c => c.Id == p.CategoryId)?.Name ?? "Không xác định"
             }).ToList();
-
             return View(viewModel);
         }
 

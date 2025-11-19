@@ -1,14 +1,105 @@
-﻿<h1 class="bg-info text-white">Login</h1>
-<div class="text-danger" asp-validation-summary="All"></div>
+﻿
+@{
+    ViewData["Title"] = "Đăng Nhập Tài Khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<form method="post">
-    <div class="form-group">
-        <label>Email</label>
-        <input name="email" class="form-control" />
+<style>
+    .ecom-banner {
+        background: linear-gradient(135deg, #0d6efd 0%, #17a2b8 100%);
+        color: white;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 3rem;
+        border-radius: 0.75rem 0 0 0.75rem;
+        box-shadow: inset -5px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-container {
+        min-height: 85vh; 
+    }
+</style>
+
+<div class="container login-container d-flex align-items-center justify-content-center">
+
+    <div class="row w-100 shadow-xl rounded-4 overflow-hidden bg-white" style="max-width: 1200px;">
+
+        <div class="col-lg-6 d-none d-lg-flex">
+            <div class="ecom-banner">
+                <h2 class="display-5 fw-bold mb-3 text-center">
+                    Gia Nhập Cộng Đồng Mua Sắm
+                </h2>
+                <p class="lead text-center mb-4 opacity-75">
+                    Đăng nhập để nhận ưu đãi cá nhân, quản lý đơn hàng và trải nghiệm các sản phẩm mới nhất.
+                </p>
+                <img src="~/img/login-promo.png" alt="E-commerce Promotion" class="img-fluid w-50 mb-4" />
+                <a asp-controller="Product" asp-action="Index" class="btn btn-outline-light btn-lg fw-bold mt-3">
+                    <i class="fas fa-eye me-2"></i> Khám Phá Ngay
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-6 p-4 p-md-5">
+
+            <div class="text-center mb-4">
+                <img src="~/img/logo.png" alt="Logo" width="48" height="48" class="mb-3" />
+                <h3 class="fw-bolder text-dark">Chào Mừng Trở Lại!</h3>
+                <p class="text-muted">Đăng nhập để tiếp tục mua sắm.</p>
+            </div>
+
+            
+
+            <form method="post">
+
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-semibold">
+                        <i class="fas fa-at me-1 text-secondary"></i> Email
+                    </label>
+                    <input name="email" id="email" class="form-control form-control-lg" placeholder="your.email@example.com" required />
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="form-label fw-semibold">
+                        <i class="fas fa-lock me-1 text-secondary"></i> Mật khẩu
+                    </label>
+                    <input name="password" id="password" type="password" class="form-control form-control-lg" placeholder="********" required />
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="rememberMe">
+                        <label class="form-check-label text-muted small" for="rememberMe">
+                            Ghi nhớ đăng nhập
+                        </label>
+                    </div>
+                    <a href="#" class="small text-primary fw-semibold text-decoration-none">Quên mật khẩu?</a>
+                </div>
+
+                <div class="d-grid gap-2 mb-3">
+                    <button class="btn btn-primary btn-lg fw-bold py-2" type="submit">
+                        <i class="fas fa-arrow-right-to-bracket me-2"></i> ĐĂNG NHẬP
+                    </button>
+                </div>
+
+            </form>
+
+            <div class="text-center mt-4 pt-3 border-top">
+                <p class="text-muted mb-0">
+                    Chưa có tài khoản?
+                    <a asp-controller="Operation" asp-action="Create" class="fw-bolder text-success text-decoration-none">Đăng ký tài khoản mới</a>
+                </p>
+            </div>
+
+        </div>
+
     </div>
-    <div class="form-group">
-        <label>Password</label>
-        <input name="password" class="form-control" />
-    </div>
-    <button class="btn btn-primary" type="submit">Log In</button>
-</form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

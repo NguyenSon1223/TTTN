@@ -40,24 +40,21 @@ namespace Ecommerce.Controllers
                     }
                 }
                 ModelState.AddModelError(nameof(email), "Login Failed: Invalid Email or Password");
+                TempData["error"] = "Đăng nhập thất bại !";
             }
-
+            TempData["success"] = "Tài khoản đã được đăng nhập !";
             return View();
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            // Xóa Session (nếu đang bật)
             HttpContext.Session.Clear();
 
-            // Xóa cookie của Identity
             await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
 
-            // Xóa cookie xác thực
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            // Chuyển hướng về trang Login
+            TempData["success"] = "Đăng xuất thành công !";
             return RedirectToAction("Login", "Account");
         }
     }

@@ -2,7 +2,14 @@
 
 <div class="container mt-5">
     <h2 class="mb-4 text-success">Lịch sử thanh toán của bạn</h2>
-
+    @if (Model is null)
+    {
+        <h1>Bạn chưa có giao dịch nào cả</h1>
+    }
+    else
+    {
+        
+    
     <table class="table table-bordered table-hover align-middle">
         <thead class="table-success">
             <tr>
@@ -14,6 +21,8 @@
             </tr>
         </thead>
         <tbody>
+            
+            
             @foreach (var bill in Model)
             {
                 <tr>
@@ -30,6 +39,9 @@
                     </td>
                 </tr>
             }
+            
+            
         </tbody>
     </table>
+    }
 </div>
